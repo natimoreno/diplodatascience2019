@@ -6,11 +6,3 @@ En proyecto contiene la solución de ejercicios prácticos correspondiente a las
 
 Para la instalación de las herramientas necesarias para la visualización y ejecución de los prácticos, se puede seguir el instructivo que se encuentran en el repositorio de [Análisis y Visualización de Datos.](https://github.com/DiploDatos/AnalisisyVisualizacion)
 
-Equipo: 
-
-        Carolina Diaz, 
-        Juan Fabro, 
-        Natalia Moreno, 
-        Pablo Brizuela
-        
- 
