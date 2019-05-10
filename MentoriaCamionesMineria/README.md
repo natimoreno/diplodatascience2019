@@ -1,5 +1,6 @@
 ## Practico I
 
 Equipo: 
-		Natalia Moreno, 
-        Juan Fabro, 
+
+	Natalia Moreno
+        Juan Fabro
