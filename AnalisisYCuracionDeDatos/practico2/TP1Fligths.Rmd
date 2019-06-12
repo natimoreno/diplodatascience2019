@@ -1,0 +1,98 @@
+---
+title: "Visualización y Curación de Datos - TP1 Fligths"
+author: "Carolina Diaz, Juan Fabro, Natalia Moreno"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+#### Data Set
+
+Documentación de referencia del dataset [nycflighs13](https://www.rdocumentation.org/packages/nycflights13/versions/1.0.0)
+
+Comenzamos realizando una exploración de inicial de los datos:
+
+```{r}
+set.seed(3)
+library(nycflights13)
+fligths<-nycflights13::flights
+fligths[1:5,]
+```
+
+Presenta 19 columnas con 336.776 registros:
+
+```{r}
+dim(fligths)
+```
+
+Las columnas son las siguientes:
+
+```{r}
+names(flights)
+```
+
+Importamos la librerias de trabajo, en este caso utilizaremos consultas SQL:
+
+```{r}
+#install.packages("sqldf")
+library(sqldf)
+```
+
+Obtenemos los vuelos que arribaron con un retraso de 2 o más horas:
+
+```{r}
+sqldf("Select flight, arr_delay from fligths where arr_delay >= '120'")
+```
+
+Seleccionamos los vuelos cuyo destino era Houston:
+
+```{r}
+sqldf("Select flight, dest from fligths where dest in ('IAH', 'HOU')")
+```
+
+Los vuelos que fueron operados por United, American o Delta. Para esto consultamos los nombres y codigo de las operadoras:
+
+```{r}
+library(nycflights13)
+airlines<-nycflights13::airlines
+airlines
+```
+
+Seguidamente consultamos todos los vuelos relacionados a estas tres operadoras:
+
+```{r}
+sqldf("Select f.flight , a.name from fligths f join airlines a on f.carrier = a.carrier where a.name in ('United Air Lines Inc.', 'American Airlines Inc.', 'Delta Air Lines Inc.')")
+```
+
+Verificamos consultando sin cruzar las tablas, consultando por codigos, obteniendo la misma cantidad de registros:
+
+```{r}
+sqldf("Select f.flight, f.carrier from fligths f where f.carrier in ('AA', 'DL', 'UA')")
+```
+
+Podemos contar la cantidad por operadora y obtenemos los 139.504 vuelos:
+
+```{r}
+sqldf("Select count(f.flight), a.name from fligths f, airlines a where f.carrier = a.carrier and a.name in ('United Air Lines Inc.', 'American Airlines Inc.', 'Delta Air Lines Inc.') group by a.name")
+```
+
+
+Consultamos los vuelos que salieron en los meses de Julio, Agosto y Septiembre:
+
+```{r}
+sqldf("Select f.flight from fligths f where f.month in (7, 8, 9)")
+```
+
+Los vuelos que arribaron con demora de 2 horas o mas pero salieron en termino:
+
+```{r}
+sqldf("Select flight, carrier, dest from fligths where arr_delay >= '120' and dep_delay ='0'")
+```
+
+Por ultio consultamos los vuelos que salieron entre las 0 y las 6 AM:
+
+```{r}
+sqldf("Select flight, carrier, dest, dep_time from fligths where dep_time between '0' and '600'")
+```
+

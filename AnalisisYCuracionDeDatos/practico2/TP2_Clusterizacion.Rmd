@@ -1,0 +1,264 @@
+---
+title: "Visualización y Curación de Datos"
+author: "Natalia Moreno"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Trabajo Práctico 2
+
+
+```{r echo=TRUE}
+# install.packages("mclust")
+```
+
+Para este trabajo práctico se trabaja el dataset [mtcars](https://www.rdocumentation.org/packages/datasets/versions/3.6.0/topics/mtcars)
+
+Inspeccionamos el dataset:
+
+```{r}
+data("mtcars")
+mtcars
+```
+
+```{r}
+# Agrego las marcas como columna, por si es necesario utilizar mas adelante pero no lo usamos
+cars<-subset(mtcars)
+cars$names <- rownames(cars)
+cars
+```
+
+```{r}
+# Observamos la dimensión del dataset:
+dim(mtcars)
+```
+
+```{r}
+# El nombre de las columnas:
+names(mtcars)
+```
+
+```{r}
+rownames(mtcars)
+```
+
+```{r}
+# La estructura de los datos:
+str(mtcars)
+```
+
+
+```{r}
+# Las principales medidas de la muestra:
+summary(mtcars)
+```
+
+
+## Mixturas de Gaussianas, el modelo EM (Máxima expectación)
+
+Para este modelo vamos a trabajar con la libreria mclust:
+
+```{r}
+# Mclust comes with a method of hierarchical clustering. 
+library(mclust)
+# initialize 3 different classes.
+initialk <- mclust::hc(data = mtcars, modelName = "EII") #EDDA , EII
+initialk <- mclust::hclass(initialk, 3)
+```
+
+Vamos a trabajar las 4 primeras variables del set de datos: mpg, cyl, disp y hp. 
+
+  mpg: Miles/(US) gallon, millas por galon.
+  cyl: Number of cylinders, número de cilindradas.
+  disp: Displacement (cu.in.), desplazamiento.
+  hp: Gross horsepower, potencia bruta.
+
+Seleccionamos nuestras 4 variables y pasamos a realizar cálculos para 2 grupos:
+
+```{r}
+# Select 4 variables and look for two distinct groups.
+mcl.model2 <- Mclust(mtcars[, 1:4], 2)
+# Plot our results.
+plot(mcl.model2, what = "classification", main = "Mclust Classification")
+```
+
+```{r}
+summary(mcl.model2, parameters = TRUE)
+```
+
+Lo mismo para 3 grupos:
+
+```{r}
+# Select 4 continuous variables and look for three distinct groups.
+mcl.model3 <- Mclust(mtcars[, 1:4], 3)
+# Plot our results.
+plot(mcl.model3, what = "classification", main = "Mclust Classification")
+```
+
+```{r}
+summary(mcl.model3, parameters = TRUE)
+```
+
+Y finalmente para 4 grupos:
+
+```{r}
+# Select 4 continuous variables and look for four distinct groups.
+mcl.model4 <- Mclust(mtcars[, 1:4], 4)
+# Plot our results.
+plot(mcl.model4, what = "classification", main = "Mclust Classification")
+```
+
+
+```{r}
+summary(mcl.model4, parameters = TRUE)
+```
+
+Pareciera que para 4 grupos, el modelo incorpora la mayor cantidad de componentes en los grafos ?.
+
+La libreria mtclust tiene la capacidad de seleccionar el modelo que considera óptimo para un dataset dado, vamos a aplicarlo en nuetro ejemplo, para esto no le indicamos el valor 'k', dejamos que lo determine automáticamente:
+
+```{r}
+# Select 4 continuous variables.
+mcl.modelx <- Mclust(mtcars[, 1:4])
+# Plot our results.
+plot(mcl.modelx, what = "classification", main = "Mclust Classification")
+```
+
+```{r}
+summary(mcl.modelx)
+```
+
+El algoritmo de ajuste selecciona como mejor modelo el formado por 4 clusters, los cuales tendrian forma elipsoidal y de igual forma para las variables involucradas.
+
+Ahora vamos dejar que lo determine automaticamente pero vamos a incorporar una variante, vamos a normalizar los datos:
+
+```{r}
+mtcars.normal = as.data.frame(scale(mtcars[,1:4]))
+```
+
+```{r}
+# Select 4 continuous variables.
+mcl.normal_modelx <- Mclust(mtcars.normal[, 1:4])
+# Plot our results.
+plot(mcl.normal_modelx, what = "classification", main = "Mclust Classification")
+```
+
+```{r}
+summary(mcl.normal_modelx)
+```
+
+Al normalizar los datos, el algoritmo seleccion un modelo de 3 clusters, que dan como resultados grafos de forma elipsoidal y todos ellos de igual forma.
+
+
+
+## Clustering K-means
+
+Se trata de un algoritmo no supervisado que busca en las observaciones grupos con características similares y diferentes a otros grupos. Esto es maximizar la variación inter-cluster, y minimizar la intra-cluster. 
+Entre sus ventajas se encuentra que es económico, de almacenamiento reducido, ya que solo guarda los clusters, en cuanto a sus desventajas es la necesidad de probar para determinar el mejor número de clusters, ademas se puede encontrar influenciado por los outliers.
+
+Vamos a aplicar el algoritmo k-means, en este caso vamos a trabajar las primeras cuatro variables:
+
+  mpg: Miles/(US) gallon, millas por galon.
+  cyl: Number of cylinders, número de cilindradas.
+  disp: Displacement (cu.in.), desplazamiento.
+  hp: Gross horsepower, potencia bruta.
+
+```{r}
+mtcars[,1:4]
+```
+
+Como los datos se encuentra sin normalizar, podria pasar que cyl por ejemplo, tenga menos peso que el resto de las variables. Normalizamos el dataset para que todas las variables tengan igual peso:
+
+```{r}
+mtcars.normal = as.data.frame(scale(mtcars[,1:4]))
+```
+
+Seteamos una semilla para reproducir el experimento y clusterizamos, en este ejemplo vamos a trabajar con 4 clusters:
+
+```{r}
+set.seed(5)
+mtcars.km <- kmeans(mtcars.normal[, 1:4], centers = 4)
+mtcars.km
+```
+
+    totss: Inercia total, inercia de los grupos respecto del centroide de todos los grupos
+    betweenss: Inercia entre grupos (inter-grupos), deberia ser la mayor posible (asegura heterogenidad)
+    withinss: Inercia intra-grupos
+    tot.withinss: la suma de las inercias intra-grupos
+
+Podemos observar el contenido del objeto por secciones:
+
+```{r}
+# centros:
+mtcars.km$centers
+```
+
+```{r}
+# Inercia total:
+mtcars.km$totss
+```
+
+```{r}
+# Inercia entre grupos:
+mtcars.km$betweenss
+```
+
+```{r}
+# Inercia intra-grupos:
+mtcars.km$withinss
+```
+
+Interaremos graficar los resultados, visualizando las cuatro variables que seleccionamos para el experimento en función de los clusters:
+
+```{r}
+table(mtcars.km$cluster, mtcars$mpg, mtcars$cyl, mtcars$disp, mtcars$hp)
+```
+
+```{r}
+library(ggplot2)
+mtcars.km$cluster <- as.factor(mtcars.km$cluster)
+ggplot(mtcars, aes(mpg, cyl, disp, hp, color = mtcars.km$cluster)) + geom_point()
+```
+
+#### Determinación del número de clusters óptimos
+
+Como explicamos mas arriba, el algoritmo busca entre otras cosas, maximizar las variaciones entre grupos. Con lo cual podemos almacenar en un vector estos valores (betweens) para n valores de cluster:
+
+```{r}
+#Vector que almacena los valores inter-grupos:
+subInterg<- kmeans(mtcars.normal, centers = 1)$betweenss
+```
+
+```{r}
+#Vector con betweenss para cada cluster
+for (i in 2:10) subInterg[i]<-kmeans(mtcars.normal, centers = i)$betweenss
+```
+
+```{r}
+#Graficamos los variaciones inter-grupo
+plot(1:10, subInterg, type='b', xlab = "Números de clustes", ylab = "Suma de cuadrados inter-grupos")
+```
+
+Un valor de 4 o 6 podria ser un valor válido para nuestro ejemplo. Si ahora probamos con 6 centros:
+
+```{r}
+set.seed(5)
+mtcars.km6 <- kmeans(mtcars.normal[, 1:4], centers = 6)
+mtcars.km6
+```
+
+```{r}
+table(mtcars.km6$cluster, mtcars$mpg, mtcars$cyl, mtcars$disp, mtcars$hp)
+```
+
+```{r}
+library(ggplot2)
+mtcars.km6$cluster <- as.factor(mtcars.km6$cluster)
+ggplot(mtcars, aes(mpg, cyl, disp, hp, color = mtcars.km6$cluster)) + geom_point()
+```
+
+Al aplicar 6 centros, ahora aparecen nuevas features en el centro y en la parte superior.
+
+Es importante, notar que debieramos trabajar con el experto en el dataset para poder analizar, interpretar y aplicar el feedback necesario en cada caso. Sin embargo, estos ejemplos nos ayudado a tener una idea del funcionamiento de los algoritmo y el potencial detras de ellos. 
+
