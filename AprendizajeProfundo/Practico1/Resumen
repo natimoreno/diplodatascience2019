@@ -1,0 +1,27 @@
+### Resumen
+
+El conjunto de datos Pet finder refiere a una problemática de Clasificación, 
+con una posible distribución bimodal ?, las clases se encuentran desbalanceadas, 
+evidenciándose sobre todo en los gráficos resultantes de aplicar una predicción.
+La métrica utilizada para medir los algoritmo fue la accurancy, a conciencia que
+existen mejores métricas, es un punto a mejorar en próximos trabajos.
+Nos quedamos con una red neuronal bien básica de 64 neuronas, una capa densa con 
+funcion de activacion relu, y la capa de salida con función softmax dado que los 
+datos estaban normalizados. Al jugar con los hiperparametros el modelo overfiteo, 
+seguramente por la falta de experiencia, con lo cual decidimos dejar la red simple 
+pero con resultados más realistas a la hora de obtener clasificaciones.
+Se intentó mejorar los resultados retirando columnas, un poco por intuición, pensando
+que las columnas de aspecto no visuales referidos a las mascotas podrían representar 
+mejor el comportamiento en las adopciones, retirando por ejemplo: Dewormed, Sterilized, 
+State. Sin embargo se obtienen mejores resultados con todos los datos disponibles. 
+Las descripciones de las mascotas tampoco parece agregar resultados notorios en el 
+algoritmo, comparado con los resultados que se obtuvieron en Aprendizaje Supervisado, 
+donde ya habíamos experimentado con una red neuronal muy simple. 
+
+Nos queda como materia pendiente el uso de una red convulcional que trabaje con las 
+imágenes disponibles del dataset, aspecto que posiblemente marque alguna diferencia 
+sobre este conjunto de datos.
+
+También nos queda materia pendiente, utilizar una herramienta acorde, para dejar 
+ejecuciones desatendidas en lugar de utilizar Colab, aunque es una salida rápida para 
+una prueba inicial.
